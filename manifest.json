@@ -1,0 +1,11 @@
+{
+  "name": "Guti Arena",
+  "short_name": "Guti Arena",
+  "id": "com.gutiarena.game",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0e1020",
+  "theme_color": "#0e1020",
+  "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}]
+}

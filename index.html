@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guti Arena</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0e1020">
+<link rel="icon" href="icon.svg">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#0e1020;--card:#1a1d36;--card2:#232749;--line:#3a4080;--txt:#f1f2ff;--mut:#9aa0d0;--teal:#2de2c4;--amber:#ffb23e;--gold:#ffd34d}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{font-family:system-ui,-apple-system,Roboto,sans-serif;color:var(--txt);background:radial-gradient(120% 70% at 50% 0%,#2a2f6b 0%,var(--bg) 60%) fixed;-webkit-tap-highlight-color:transparent;user-select:none}
+.screen{display:none;min-height:100%;padding:18px 18px 28px;flex-direction:column}
+.screen.on{display:flex}
+.logo{margin:46px auto 0;width:120px;height:120px}
+h1{margin:14px 0 0;text-align:center;font-size:38px;letter-spacing:1px;font-weight:900}
+h1 span{background:linear-gradient(90deg,var(--teal),var(--amber));-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{text-align:center;color:var(--mut);margin:6px 0 0}
+.spacer{flex:1;min-height:30px}
+.primary{border:0;border-radius:20px;padding:22px;font-size:20px;font-weight:800;color:#0e1020;background:linear-gradient(90deg,var(--teal),#6df0a8);box-shadow:0 8px 24px rgba(45,226,196,.3);width:100%;cursor:pointer}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.tile{border:1px solid var(--line);background:var(--card);color:var(--txt);border-radius:18px;padding:18px 10px;font-size:16px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px}
+.tile i{font-style:normal;font-size:26px}
+.chip{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-weight:800;color:var(--gold);display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ib{width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:var(--card);color:var(--txt);font-size:20px;cursor:pointer}
+.ttl{font-size:22px;font-weight:800}
+.status{display:flex;align-items:center;justify-content:center;gap:10px;margin:8px auto;padding:10px 20px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-weight:700}
+.dot{width:14px;height:14px;border-radius:50%}
+.rule{text-align:center;color:var(--mut);font-size:13px;margin:4px 0}
+.boardwrap{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:10px;margin:12px auto;width:100%;max-width:420px;box-shadow:inset 0 0 40px rgba(60,70,170,.25)}
+#board{width:100%;display:block;touch-action:manipulation}
+.acts{display:flex;gap:12px;margin-top:auto}
+.acts button{flex:1;padding:16px;border-radius:16px;font-size:16px;font-weight:800;cursor:pointer;border:1px solid var(--line);background:var(--card2);color:var(--txt)}
+.acts .u{border-color:var(--amber);color:var(--amber)}
+.packs{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pack{position:relative;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 10px;text-align:center;cursor:pointer;color:var(--txt)}
+.pack b{display:block;font-size:20px;color:var(--gold);margin:6px 0}
+.pack small{color:var(--mut);font-size:15px}
+.pack em{position:absolute;top:-9px;right:10px;font-style:normal;font-size:11px;font-weight:800;background:var(--amber);color:#0e1020;padding:3px 8px;border-radius:999px}
+.row{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:10px;font-weight:700;font-size:17px;cursor:pointer;width:100%;color:var(--txt);text-align:left}
+.sw{width:46px;height:26px;border-radius:99px;background:#444a80;position:relative;transition:.2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on{background:var(--teal)}.sw.on::after{left:23px}
+#modal{position:fixed;inset:0;background:rgba(5,6,20,.7);display:none;align-items:center;justify-content:center;padding:24px}
+#modal.on{display:flex}
+.mbox{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:30px 24px;text-align:center;width:100%;max-width:340px}
+.mbox h2{margin:0 0 6px;font-size:30px}
+.mbox p{color:var(--mut);margin:0 0 20px}
+.sheetbg{position:fixed;inset:0;background:rgba(5,6,20,.65);display:none;align-items:flex-end;justify-content:center}.sheetbg.on{display:flex}.sheet{background:var(--card);border-top:1px solid var(--line);border-radius:26px 26px 0 0;padding:26px 22px calc(26px + env(safe-area-inset-bottom,0px));width:100%;max-width:480px;text-align:center}.sheet h3{margin:0;font-size:26px;color:var(--gold)}.sheet p{color:var(--mut);margin:8px 0}.sheet .test{font-size:12px;background:var(--card2);border-radius:10px;padding:8px;margin:14px 0}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.screen.on{animation:fade .25s ease}
+button,.row,.tile,.pack,.chip{transition:transform .12s}
+button:active,.row:active,.tile:active,.pack:active{transform:scale(.96)}
+.pc{transition:transform .28s cubic-bezier(.3,1.3,.5,1)}
+#board:not(.ready) .pc{transition:none}
+.lv{display:flex;gap:8px;justify-content:center;margin:6px 0}
+.lv button{border:1px solid var(--line);background:var(--card);color:var(--mut);border-radius:999px;padding:7px 16px;font-weight:700;font-size:14px;cursor:pointer}
+.lv button.on{background:var(--teal);color:#0e1020;border-color:var(--teal)}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:.8}}
+#hl .d{animation:pulse 1s infinite}
+#toast{position:fixed;left:50%;bottom:calc(26px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#000c;color:#fff;padding:12px 20px;border-radius:14px;opacity:0;transition:.3s;pointer-events:none;text-align:center;max-width:90%}
+#toast.on{opacity:1}
+</style>
+</head>
+<body>
+
+<div id="menu" class="screen on">
+  <svg class="logo" viewBox="0 0 120 120"><rect x="14" y="14" width="92" height="92" rx="22" fill="#1a1d36" stroke="#3a4080" stroke-width="2"/>
+    <path d="M30 30L90 90M90 30L30 90M30 60H90M60 30V90" stroke="#3a4080" stroke-width="3"/>
+    <circle cx="30" cy="30" r="9" fill="#2de2c4"/><circle cx="90" cy="30" r="9" fill="#2de2c4"/><circle cx="60" cy="30" r="9" fill="#2de2c4"/>
+    <circle cx="30" cy="90" r="9" fill="#ffb23e"/><circle cx="90" cy="90" r="9" fill="#ffb23e"/><circle cx="60" cy="90" r="9" fill="#ffb23e"/></svg>
+  <h1>Guti <span>Arena</span></h1>
+  <p class="tag">৩ গুটির স্ট্র্যাটেজি খেলা</p>
+  <div class="spacer"></div>
+  <button class="primary" onclick="start('bot')">▶ বটের সাথে খেলো</button>
+  <div class="grid">
+    <button class="tile" onclick="start('friend')"><i>🤝</i>বন্ধুর সাথে</button>
+    <button class="tile" onclick="show('store')"><i>💎</i>কয়েন স্টোর</button>
+    <button class="tile" onclick="show('settings')"><i>⚙️</i>সেটিংস</button>
+    <button class="tile" onclick="show('how')"><i>📖</i>নিয়ম</button>
+  </div>
+  <div style="text-align:center;margin-top:18px"><span class="chip" onclick="show('store')">🪙 <span class="cn">50</span></span></div>
+</div>
+
+<div id="game" class="screen">
+  <div class="bar"><button class="ib" onclick="show('menu')">←</button><span class="ttl">Guti Arena</span><span class="chip" onclick="show('store')">🪙 <span class="cn">50</span></span></div>
+  <div class="status"><span class="dot" id="sdot"></span><span id="stxt"></span></div>
+  <div class="lv" id="lv"></div>
+  <div class="rule">এক ধাপ করে চালো · নিজের শুরুর সারিতে জেতা যাবে না</div>
+  <div class="rule" id="rec"></div>
+  <div class="boardwrap"><svg id="board" viewBox="0 0 400 400"></svg></div>
+  <div class="acts">
+    <button class="u" onclick="undo()">↩ আনডু · 5 🪙</button>
+    <button onclick="restart()">⟳ নতুন খেলা</button>
+  </div>
+</div>
+
+<div id="store" class="screen">
+  <div class="bar"><button class="ib" onclick="history.length>1&&0;show(last)">←</button><span class="ttl">কয়েন স্টোর</span><span class="chip">🪙 <span class="cn">50</span></span></div>
+  <div class="packs" id="packs"></div>
+  <button class="row" style="margin-top:16px" onclick="toast('মোট ক্রয়: '+owned.length+' টি')">🧾 ক্রয়ের ইতিহাস</button>
+</div>
+
+<div id="settings" class="screen">
+  <div class="bar"><button class="ib" onclick="show('menu')">←</button><span class="ttl">সেটিংস</span><span style="width:42px"></span></div>
+  <div class="row" onclick="tgl('snd')">🔊 সাউন্ড<span class="sw on" id="sw_snd"></span></div>
+  <div class="row" onclick="tgl('vib')">📳 ভাইব্রেশন<span class="sw on" id="sw_vib"></span></div>
+  <button class="row" onclick="share()">📤 বন্ধুদের শেয়ার করো</button>
+  <button class="row" onclick="toast('স্টোর ভার্সনে রেটিং পাওয়া যাবে')">⭐ গেমটি রেট করো</button>
+  <button class="row" onclick="toast('এখানে আপনার সাপোর্ট ইমেইল বসান')">✉️ সাপোর্ট</button>
+  <button class="row" onclick="toast('এখানে প্রাইভেসি পলিসির লিংক বসান')">🔒 প্রাইভেসি পলিসি</button>
+</div>
+
+<div id="how" class="screen">
+  <div class="bar"><button class="ib" onclick="show('menu')">←</button><span class="ttl">নিয়ম</span><span style="width:42px"></span></div>
+  <div class="row" style="cursor:default;display:block;line-height:1.7;font-weight:500">
+    ১. প্রত্যেকের ৩টি গুটি, উল্টো দিকের সারিতে।<br>
+    ২. প্রতিবার একটি গুটি রেখা ধরে পাশের খালি ঘরে যায়।<br>
+    ৩. নিজের তিনটি গুটি এক লাইনে আনলে জয়।<br>
+    ৪. নিজের শুরুর সারিতে লাইন বানালে জয় হয় না।<br>
+    ৫. ভুল চাল? ৫ কয়েন দিয়ে আনডু করো।</div>
+</div>
+
+<div id="modal"><div class="mbox"><h2 id="mt"></h2><p id="mp"></p>
+  <button class="primary" onclick="closeModal();restart()">আবার খেলো</button>
+  <button class="tile" style="width:100%;margin-top:10px" onclick="closeModal();show('menu')">মেনু</button></div></div>
+<div class="sheetbg" id="sheet" onclick="if(event.target===this)cancelBuy()"><div class="sheet"><div style="font-size:44px">🪙</div><h3 id="pc"></h3><p>মূল্য: <b id="pp" style="color:#fff"></b></p><div class="test">⚠️ ওয়েব টেস্ট মোড — আসল টাকা কাটা হবে না (আসল পেমেন্ট শুধু অ্যান্ড্রয়েড অ্যাপে)</div><button class="primary" id="pbtn" onclick="confirmBuy()">কনফার্ম</button><button class="tile" style="width:100%;margin-top:10px" onclick="cancelBuy()">বাতিল</button></div></div>
+<div id="toast"></div>
+
+<script>
+const $=id=>document.getElementById(id);
+let coins=50,set={snd:true,vib:true},last='menu';
+try{const c=localStorage.getItem('ga_coins');if(c!==null)coins=+c;const s=localStorage.getItem('ga_set');if(s)set=JSON.parse(s)}catch(e){}
+function saveAll(){try{localStorage.setItem('ga_coins',coins);localStorage.setItem('ga_set',JSON.stringify(set))}catch(e){}
+  document.querySelectorAll('.cn').forEach(e=>e.textContent=coins.toLocaleString());
+  ['snd','vib'].forEach(k=>$('sw_'+k).classList.toggle('on',set[k]))}
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)}
+function show(id){const cur=document.querySelector('.screen.on');if(cur&&cur.id!=='store')last=cur.id;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on')}
+function tgl(k){set[k]=!set[k];saveAll()}
+function share(){const d={title:'Guti Arena',text:'আমার সাথে Guti Arena খেলো!',url:location.href};
+  if(navigator.share)navigator.share(d).catch(()=>{});else toast('এখানে শেয়ার সাপোর্ট নেই')}
+let ac;function beep(f,d=.08){if(!set.snd)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.value=.08;o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function vib(n){if(set.vib&&navigator.vibrate)try{navigator.vibrate(n)}catch(e){}}
+
+const packs=[[50,'$0.51'],[100,'$1.01'],[200,'$2.01'],[300,'$3.01'],[400,'$4.01'],[500,'$5.01'],[600,'$6.01'],[700,'$7.01'],[800,'$8.01'],[900,'$9.01'],[1000,'$10.01'],[1500,'$15.01'],[3000,'$30.01'],[5000,'$50.01']];
+function priceOf(i){try{if(store){const pr=store.get(IDS[i],CdvPurchase.Platform.GOOGLE_PLAY);const o=pr&&pr.getOffer();if(o)return o.pricingPhases[0].price}}catch(e){}return packs[i][1]}
+function renderPacks(){$('packs').innerHTML=packs.map((p,i)=>`<button class="pack" onclick="buy(${i})">${i===3?'<em>POPULAR</em>':''}${i===13?'<em>BEST</em>':''}<span style="font-size:26px">🪙</span><b>${p[0].toLocaleString()}</b><small>${priceOf(i)}</small></button>`).join('')}
+
+let pending=null,paying=false,owned=[];
+try{owned=JSON.parse(localStorage.getItem('ga_buys')||'[]')}catch(e){}
+// Billing adapter: নেটিভ অ্যাপে এই অবজেক্টটি Google Play Billing / StoreKit দিয়ে বদলাতে হবে
+const Billing={async purchase(p){await new Promise(r=>setTimeout(r,1200));return{ok:true,id:'tx_'+Date.now()}}};
+function buy(i){if(store)return orderNative(i);pending=i;$('pc').textContent=packs[i][0].toLocaleString()+' কয়েন';$('pp').textContent=packs[i][1];$('sheet').classList.add('on')}
+function cancelBuy(){if(!paying)$('sheet').classList.remove('on')}
+async function confirmBuy(){
+  if(paying)return;paying=true;$('pbtn').textContent='প্রসেসিং…';
+  const p=packs[pending];let r;
+  try{r=await Billing.purchase(p)}catch(e){r={ok:false}}
+  paying=false;$('pbtn').textContent='কনফার্ম';$('sheet').classList.remove('on');
+  if(r.ok){coins+=p[0];owned.push({id:r.id,coins:p[0],price:p[1],t:Date.now()});
+    try{localStorage.setItem('ga_buys',JSON.stringify(owned.slice(-50)))}catch(e){}
+    saveAll();beep(660,.2);toast('✅ '+p[0].toLocaleString()+' কয়েন যোগ হয়েছে')}
+  else toast('পেমেন্ট ব্যর্থ হয়েছে')
+}
+
+// ===== Real in-app purchase (Google Play Billing via cordova-plugin-purchase) =====
+const IDS=packs.map(p=>'coins_'+p[0]);   // Play Console এ এই product ID গুলো বানাতে হবে
+let store=null;
+function initBilling(){
+  if(store||!window.CdvPurchase)return;
+  const S=CdvPurchase.store,{ProductType,Platform}=CdvPurchase;
+  store=S;
+  S.register(IDS.map(id=>({id,type:ProductType.CONSUMABLE,platform:Platform.GOOGLE_PLAY})));
+  S.when().productUpdated(()=>renderPacks())
+   .approved(t=>{
+     t.products.forEach(pr=>{const n=+String(pr.id).split('_')[1]||0;
+       if(n){coins+=n;owned.push({id:t.transactionId||('tx_'+Date.now()),coins:n,price:priceOf(IDS.indexOf(pr.id)),t:Date.now()})}});
+     try{localStorage.setItem('ga_buys',JSON.stringify(owned.slice(-50)))}catch(e){}
+     saveAll();beep(660,.2);toast('✅ কয়েন যোগ হয়েছে');
+     t.finish();
+   });
+  S.error(e=>{if(e&&e.code!==CdvPurchase.ErrorCode.PAYMENT_CANCELLED)toast('পেমেন্ট ব্যর্থ হয়েছে')});
+  S.initialize([Platform.GOOGLE_PLAY]).then(renderPacks);
+}
+function orderNative(i){
+  const pr=store.get(IDS[i],CdvPurchase.Platform.GOOGLE_PLAY),o=pr&&pr.getOffer();
+  if(!o){toast('প্রোডাক্ট পাওয়া যায়নি — Play Console চেক করো');return}
+  store.order(o);
+}
+const P=[[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[1,2],[2,2]].map(([x,y])=>[70+x*130,70+y*130]);
+const ADJ=[[1,3,4],[0,2,4],[1,5,4],[0,6,4],[0,1,2,3,5,6,7,8],[2,8,4],[3,7,4],[6,8,4],[5,7,4]];
+const LINES=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+const START={1:[0,1,2],2:[6,7,8]};
+const COL={1:'#2de2c4',2:'#ffb23e'},NAME={1:'টিল',2:'অ্যাম্বার'};
+let mode='bot',b,turn,sel=null,hist=[],over=false,busy=false,wl=null;
+
+function start(m){mode=m;$('lv').style.display=m==='bot'?'flex':'none';renderLv();show('game');restart()}
+function restart(){b=[1,1,1,0,0,0,2,2,2];turn=1;sel=null;hist=[];over=false;busy=false;wl=null;saveAll();resetEls();draw()}
+function winLine(bd,p){return LINES.find(l=>l.join()!==START[p].join()&&l.every(i=>bd[i]===p))}
+function moves(bd,p){const r=[];bd.forEach((v,i)=>{if(v===p)ADJ[i].forEach(j=>{if(!bd[j])r.push([i,j])})});return r}
+function apply(bd,m,p){const n=bd.slice();n[m[1]]=p;n[m[0]]=0;return n}
+function closeModal(){$('modal').classList.remove('on')}
+
+const NS='http://www.w3.org/2000/svg',els=[];
+let level=2,rec={w:0,l:0};
+try{level=+localStorage.getItem('ga_lv')||2;rec=JSON.parse(localStorage.getItem('ga_rec')||'{"w":0,"l":0}')}catch(e){}
+function buildBoard(){
+  let h='';
+  [[0,2],[6,8],[0,6],[2,8],[3,5],[1,7],[0,8],[2,6]].forEach(([a,c])=>{h+=`<line x1="${P[a][0]}" y1="${P[a][1]}" x2="${P[c][0]}" y2="${P[c][1]}" stroke="#3a4080" stroke-width="5" stroke-linecap="round"/>`});
+  P.forEach(p=>h+=`<circle cx="${p[0]}" cy="${p[1]}" r="20" fill="#0e1020" stroke="#3a4080" stroke-width="3"/>`);
+  h+='<g id="hl"></g><g id="pcs"></g><g>'+P.map((p,i)=>`<circle cx="${p[0]}" cy="${p[1]}" r="46" fill="transparent" onclick="tap(${i})"/>`).join('')+'</g>';
+  $('board').innerHTML=h;
+  for(let k=0;k<6;k++){const o=k<3?1:2,g=document.createElementNS(NS,'g');g.setAttribute('class','pc');
+    g.innerHTML=`<circle r="26" fill="${COL[o]}" stroke="#fff" stroke-opacity=".35" stroke-width="4"/><circle cx="-8" cy="-9" r="7" fill="#fff" opacity=".4"/>`;
+    $('pcs').appendChild(g);els.push(g)}
+}
+function resetEls(){let a=0,c=3;b.forEach((v,i)=>{if(v===1)els[a++].pos=i;else if(v===2)els[c++].pos=i})}
+function movePiece(m){const e=els.find(x=>x.pos===m[0]);if(e)e.pos=m[1]}
+function renderLv(){$('lv').innerHTML=[['সহজ',1],['মাঝারি',2],['কঠিন',3]].map(([n,v])=>`<button class="${level===v?'on':''}" onclick="setLv(${v})">${n}</button>`).join('')}
+function setLv(v){level=v;try{localStorage.setItem('ga_lv',v)}catch(e){}renderLv()}
+function draw(){
+  els.forEach(e=>{const p=P[e.pos];e.style.transform=`translate(${p[0]}px,${p[1]}px)`;
+    const c=e.firstChild;c.setAttribute('stroke',sel===e.pos?'#ffd34d':'#fff');c.setAttribute('stroke-opacity',sel===e.pos?1:.35)});
+  let h='';
+  if(wl)h+=`<polyline points="${wl.map(i=>P[i].join(',')).join(' ')}" fill="none" stroke="${COL[turn]}" stroke-width="9" stroke-linecap="round" opacity=".55"/>`;
+  if(sel!==null)ADJ[sel].filter(j=>!b[j]).forEach(j=>h+=`<circle class="d" cx="${P[j][0]}" cy="${P[j][1]}" r="13" fill="${COL[turn]}"/>`);
+  $('hl').innerHTML=h;
+  requestAnimationFrame(()=>$('board').classList.add('ready'));
+  $('sdot').style.background=COL[turn];
+  $('rec').textContent=mode==='bot'?'জয় '+rec.w+' · হার '+rec.l:'';
+  if(!over)$('stxt').textContent=turn===2&&mode==='bot'?'বট ভাবছে…':NAME[turn]+(mode==='bot'?' (তুমি)':'')+' এর পালা';
+}
+function tap(i){
+  if(over||busy||(mode==='bot'&&turn===2))return;
+  if(b[i]===turn){sel=i;beep(520,.05);draw();return}
+  if(sel!==null&&!b[i]&&ADJ[sel].includes(i))play([sel,i]);
+}
+function play(m){
+  hist.push({b:b.slice(),turn});
+  b=apply(b,m,turn);movePiece(m);sel=null;beep(turn===1?440:330);vib(15);
+  const w=winLine(b,turn);
+  if(w){over=true;wl=w;if(mode==='bot'){turn===1?rec.w++:rec.l++;try{localStorage.setItem('ga_rec',JSON.stringify(rec))}catch(e){}}draw();$('stxt').textContent=NAME[turn]+' জিতেছে!';beep(880,.3);vib([40,40,80]);
+    setTimeout(()=>{$('mt').textContent=(mode==='bot'&&turn===2)?'বট জিতেছে 🤖':'🎉 '+NAME[turn]+' জিতেছে!';
+      $('mp').textContent=mode==='bot'?(turn===1?'দারুণ খেলেছ!':'আবার চেষ্টা করো'):'অভিনন্দন!';$('modal').classList.add('on')},700);return}
+  turn=3-turn;
+  if(!moves(b,turn).length){toast('চাল নেই — পালা বাদ');turn=3-turn}
+  draw();
+  if(mode==='bot'&&turn===2){busy=true;setTimeout(botMove,500)}
+}
+function nega(bd,p,d){
+  if(d===0)return 0;
+  const ms=moves(bd,p);if(!ms.length)return 0;
+  let best=-1e9;
+  for(const m of ms){const n=apply(bd,m,p);const sc=winLine(n,p)?100+d:-nega(n,3-p,d-1);if(sc>best)best=sc}
+  return best;
+}
+function botMove(){
+  const ms=moves(b,2);if(!ms.length){busy=false;return}
+  let best=-1e9,pick=[];
+  for(const m of ms){const n=apply(b,m,2);const sc=winLine(n,2)?100:-nega(n,1,[0,1,3,5][level]);
+    if(sc>best){best=sc;pick=[m]}else if(sc===best)pick.push(m)}
+  busy=false;if(level===1&&Math.random()<.5)pick=ms;play(pick[Math.floor(Math.random()*pick.length)]);
+}
+function undo(){
+  if(busy)return;
+  const steps=mode==='bot'?2:1;
+  if(hist.length<steps){toast('আনডু করার কিছু নেই');return}
+  if(coins<5){toast('কয়েন কম — স্টোরে যাও');return}
+  coins-=5;saveAll();
+  let st;for(let k=0;k<steps;k++)st=hist.pop();
+  b=st.b;turn=st.turn;sel=null;over=false;wl=null;resetEls();draw();
+}
+buildBoard();saveAll();renderPacks();
+document.addEventListener('deviceready',initBilling);initBilling();
+</script>
+</body>
+</html>
